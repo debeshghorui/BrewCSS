@@ -1,6 +1,6 @@
 # BrewCSS
 
-BrewCSS is a lightweight utility-first CSS engine that scans brew-* class names and applies inline styles dynamically.
+BrewCSS is a lightweight utility-first CSS engine. It scans `brew-*` class names and inserts one shared stylesheet rule per unique class. Classes stay on the element. No build step.
 
 ## Install
 
@@ -19,32 +19,36 @@ npm run build
 ## Usage
 
 ```js
-import { initChai } from "@debeshghorui/brewcss";
+import { initBrew } from "@debeshghorui/brewcss";
 
-initChai();
+initBrew();
 ```
 
-## CDN Usage (Global)
+`initBrew()` scans immediately and watches for new elements and `class` changes. Pass `{ observe: false }` for a single scan. `stopBrewObserver()` disconnects the watcher.
+
+`initChai` and `stopChaiObserver` are aliases of `initBrew` and `stopBrewObserver`.
+
+## CDN Usage
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@debeshghorui/brewcss@0.1.3/dist/index.browser.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@debeshghorui/brewcss@0.2.0/dist/index.browser.js"></script>
 <script>
-  window.initchai();
-  // Alias also available:
-  // window.initChai();
+  window.initBrew();
 </script>
 ```
 
-For local demo usage in this repository:
+`window.initbrew`, `window.initChai`, and `window.initchai` call the same function.
+
+For local demo usage in this repository, build first, then:
 
 ```html
-<script type="module">
-  import { initChai } from "../src/index.js";
-  initChai();
+<script src="../dist/index.browser.js"></script>
+<script>
+  window.initBrew();
 </script>
 ```
 
-## Supported Utilities (v0.1)
+## Supported Utilities (v0.2)
 
 - Spacing: brew-p-*, brew-m-*
 - Colors: brew-bg-*, brew-text-*
@@ -58,6 +62,8 @@ For local demo usage in this repository:
 - Explicit units are supported: px, rem, em, %, vh, vw, vmin, vmax, pt
 - Percent shortcut is supported with pct suffix: brew-m-50pct -> margin: 50%
 - Colors support common tokens (red, blue, gray-100, etc.) and hex formats (#fff, #ffffff, hex-ffffff)
+
+One thousand elements with the same `brew-*` class share one CSS rule.
 
 ## License
 

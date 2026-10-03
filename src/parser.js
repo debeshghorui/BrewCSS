@@ -15,7 +15,9 @@ const VALUE_UTILITIES = new Set([
     "rounded"
 ]);
 
-export function parseChaiClass(className) {
+const cache = new Map();
+
+function parseUncached(className) {
     if (!className || !className.startsWith("brew-")) {
         return null;
     }
@@ -33,13 +35,14 @@ export function parseChaiClass(className) {
         };
     }
 
-    const [utility, ...rest] = payload.split("-");
-    if (!VALUE_UTILITIES.has(utility) || rest.length === 0) {
+    const dash = payload.indexOf("-");
+    if (dash <= 0) {
         return null;
     }
 
-    const value = rest.join("-");
-    if (!value) {
+    const utility = payload.slice(0, dash);
+    const value = payload.slice(dash + 1);
+    if (!VALUE_UTILITIES.has(utility) || !value) {
         return null;
     }
 
@@ -50,6 +53,23 @@ export function parseChaiClass(className) {
     };
 }
 
-export function extractChaiClasses(classList) {
-    return Array.from(classList).filter((name) => name.startsWith("brew-"));
+export function parseBrewClass(className) {
+    if (cache.has(className)) {
+        return cache.get(className);
+    }
+
+    const parsed = parseUncached(className);
+    cache.set(className, parsed);
+    return parsed;
+}
+
+export function extractBrewClasses(classList) {
+    const names = [];
+    for (let i = 0; i < classList.length; i++) {
+        const name = classList[i];
+        if (name.startsWith("brew-")) {
+            names.push(name);
+        }
+    }
+    return names;
 }

@@ -2,39 +2,54 @@ import { scanDOM, scanElement } from "./scanner.js";
 
 let observer = null;
 
-export function initChai(options = {}) {
-    const { root = document, observe = false } = options;
+function watch(records) {
+    for (let i = 0; i < records.length; i++) {
+        const record = records[i];
 
-    scanDOM(root);
+        if (record.type === "attributes") {
+            scanElement(record.target);
+            continue;
+        }
 
-    if (observe && root && root.body) {
-        observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.type !== "childList") {
-                    return;
-                }
+        if (record.type !== "childList") {
+            continue;
+        }
 
-                mutation.addedNodes.forEach((node) => {
-                    if (!(node instanceof Element)) {
-                        return;
-                    }
-
-                    scanElement(node);
-                    if (node.querySelectorAll) {
-                        scanDOM(node);
-                    }
-                });
-            });
-        });
-
-        observer.observe(root.body, {
-            childList: true,
-            subtree: true
-        });
+        const added = record.addedNodes;
+        for (let j = 0; j < added.length; j++) {
+            const node = added[j];
+            if (node.nodeType === 1) {
+                scanDOM(node);
+            }
+        }
     }
 }
 
-export function stopChaiObserver() {
+export function initBrew(options = {}) {
+    const root = options.root || document;
+    const observe = options.observe !== false;
+
+    scanDOM(root);
+
+    if (observer) {
+        observer.disconnect();
+        observer = null;
+    }
+
+    if (!observe || !root) {
+        return;
+    }
+
+    observer = new MutationObserver(watch);
+    observer.observe(root, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["class"]
+    });
+}
+
+export function stopBrewObserver() {
     if (!observer) {
         return;
     }
@@ -42,3 +57,6 @@ export function stopChaiObserver() {
     observer.disconnect();
     observer = null;
 }
+
+export const initChai = initBrew;
+export const stopChaiObserver = stopBrewObserver;

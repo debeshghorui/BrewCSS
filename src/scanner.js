@@ -1,42 +1,34 @@
-import { applyStyles } from "./applyStyles.js";
-import { mapUtilityToStyle } from "./mapper.js";
-import { extractChaiClasses, parseChaiClass } from "./parser.js";
+import { ensureRule } from "./sheet.js";
 
-function applyClassStyles(element) {
-    const chaiClasses = extractChaiClasses(element.classList);
-    const appliedClasses = [];
+export function scanElement(element) {
+    const classList = element && element.classList;
+    if (!classList || classList.length === 0) {
+        return;
+    }
 
-    chaiClasses.forEach((className) => {
-        const parsed = parseChaiClass(className);
-        if (!parsed) {
-            return;
+    for (let i = 0; i < classList.length; i++) {
+        const name = classList[i];
+        if (name.startsWith("brew-")) {
+            ensureRule(name);
         }
-
-        const styleMap = mapUtilityToStyle(parsed);
-        if (!styleMap) {
-            return;
-        }
-
-        applyStyles(element, styleMap);
-        appliedClasses.push(className);
-    });
-
-    appliedClasses.forEach((cls) => element.classList.remove(cls));
+    }
 }
 
 export function scanDOM(root = document) {
-    if (!root || !root.querySelectorAll) {
+    if (!root) {
         return;
     }
 
-    const nodes = root.querySelectorAll("[class]");
-    nodes.forEach((node) => applyClassStyles(node));
-}
+    if (root.classList) {
+        scanElement(root);
+    }
 
-export function scanElement(element) {
-    if (!element || !element.classList) {
+    if (!root.querySelectorAll) {
         return;
     }
 
-    applyClassStyles(element);
+    const nodes = root.querySelectorAll('[class*="brew-"]');
+    for (let i = 0; i < nodes.length; i++) {
+        scanElement(nodes[i]);
+    }
 }

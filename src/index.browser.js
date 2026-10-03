@@ -1,4 +1,4 @@
-import { initChai, stopChaiObserver } from "./index.js";
+import { initBrew, initChai, stopBrewObserver, stopChaiObserver } from "./index.js";
 
 const globalTarget =
     typeof window !== "undefined"
@@ -8,6 +8,10 @@ const globalTarget =
             : null;
 
 if (globalTarget) {
+    globalTarget.initBrew = initBrew;
+    globalTarget.initbrew = initBrew;
+    globalTarget.stopBrewObserver = stopBrewObserver;
+    globalTarget.stopbrewobserver = stopBrewObserver;
     globalTarget.initChai = initChai;
     globalTarget.initchai = initChai;
     globalTarget.stopChaiObserver = stopChaiObserver;
