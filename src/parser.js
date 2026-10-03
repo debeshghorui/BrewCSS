@@ -16,7 +16,7 @@ const VALUE_UTILITIES = new Set([
 ]);
 
 export function parseChaiClass(className) {
-    if (!className || !className.startsWith("chai-")) {
+    if (!className || !className.startsWith("brew-")) {
         return null;
     }
 
@@ -51,5 +51,5 @@ export function parseChaiClass(className) {
 }
 
 export function extractChaiClasses(classList) {
-    return Array.from(classList).filter((name) => name.startsWith("chai-"));
+    return Array.from(classList).filter((name) => name.startsWith("brew-"));
 }

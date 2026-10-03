@@ -2,130 +2,130 @@ const utilityData = [
     {
         name: "Padding",
         category: "Spacing",
-        sample: "chai-p-24",
+        sample: "brew-p-24",
         output: "padding: 24px"
     },
     {
         name: "Margin",
         category: "Spacing",
-        sample: "chai-m-16",
+        sample: "brew-m-16",
         output: "margin: 16px"
     },
     {
         name: "Background",
         category: "Colors",
-        sample: "chai-bg-blue",
+        sample: "brew-bg-blue",
         output: "background-color: #3b82f6"
     },
     {
         name: "Text Color",
         category: "Colors",
-        sample: "chai-text-white",
+        sample: "brew-text-white",
         output: "color: #ffffff"
     },
     {
         name: "Font Size",
         category: "Typography",
-        sample: "chai-fs-20",
+        sample: "brew-fs-20",
         output: "font-size: 20px"
     },
     {
         name: "Center Text",
         category: "Typography",
-        sample: "chai-center",
+        sample: "brew-center",
         output: "text-align: center"
     },
     {
         name: "Border",
         category: "Border",
-        sample: "chai-border-2",
+        sample: "brew-border-2",
         output: "border: 2px solid #000000"
     },
     {
         name: "Rounded",
         category: "Border",
-        sample: "chai-rounded-16",
+        sample: "brew-rounded-16",
         output: "border-radius: 16px"
     },
     {
         name: "Flex",
         category: "Layout",
-        sample: "chai-flex",
+        sample: "brew-flex",
         output: "display: flex"
     },
     {
         name: "Justify Center",
         category: "Layout",
-        sample: "chai-justify-center",
+        sample: "brew-justify-center",
         output: "justify-content: center"
     },
     {
         name: "Align Center",
         category: "Layout",
-        sample: "chai-items-center",
+        sample: "brew-items-center",
         output: "align-items: center"
     },
     {
         name: "Border Color",
         category: "Border",
-        sample: "chai-border-red",
+        sample: "brew-border-red",
         output: "border: 1px solid #ef4444"
     }
 ];
 
 const quickChips = [
-    "chai-p-24",
-    "chai-p-12",
-    "chai-m-12",
-    "chai-bg-red",
-    "chai-bg-blue",
-    "chai-bg-green",
-    "chai-bg-yellow",
-    "chai-text-white",
-    "chai-text-black",
-    "chai-fs-18",
-    "chai-fs-24",
-    "chai-fs-32",
-    "chai-border-2",
-    "chai-border-red",
-    "chai-rounded-8",
-    "chai-rounded-24",
-    "chai-center",
-    "chai-flex",
-    "chai-justify-center",
-    "chai-items-center"
+    "brew-p-24",
+    "brew-p-12",
+    "brew-m-12",
+    "brew-bg-red",
+    "brew-bg-blue",
+    "brew-bg-green",
+    "brew-bg-yellow",
+    "brew-text-white",
+    "brew-text-black",
+    "brew-fs-18",
+    "brew-fs-24",
+    "brew-fs-32",
+    "brew-border-2",
+    "brew-border-red",
+    "brew-rounded-8",
+    "brew-rounded-24",
+    "brew-center",
+    "brew-flex",
+    "brew-justify-center",
+    "brew-items-center"
 ];
 
 const presetData = [
     {
         name: "🎴 Card",
-        classes: "chai-p-24 chai-bg-blue chai-text-white chai-rounded-16 chai-center"
+        classes: "brew-p-24 brew-bg-blue brew-text-white brew-rounded-16 brew-center"
     },
     {
         name: "🏷️ Badge",
-        classes: "chai-p-12 chai-bg-red chai-text-white chai-rounded-24 chai-fs-18 chai-center"
+        classes: "brew-p-12 brew-bg-red brew-text-white brew-rounded-24 brew-fs-18 brew-center"
     },
     {
         name: "📦 Bordered",
-        classes: "chai-p-20 chai-border-2 chai-rounded-16 chai-center"
+        classes: "brew-p-20 brew-border-2 brew-rounded-16 brew-center"
     },
     {
         name: "🌿 Success",
-        classes: "chai-p-16 chai-bg-green chai-text-white chai-rounded-8 chai-center chai-fs-18"
+        classes: "brew-p-16 brew-bg-green brew-text-white brew-rounded-8 brew-center brew-fs-18"
     },
     {
         name: "⚠️ Warning",
-        classes: "chai-p-16 chai-bg-yellow chai-text-black chai-rounded-8 chai-center chai-fs-18"
+        classes: "brew-p-16 brew-bg-yellow brew-text-black brew-rounded-8 brew-center brew-fs-18"
     },
     {
         name: "🏗️ Flex Layout",
-        classes: "chai-flex chai-justify-center chai-items-center chai-p-24 chai-bg-blue chai-rounded-16"
+        classes: "brew-flex brew-justify-center brew-items-center brew-p-24 brew-bg-blue brew-rounded-16"
     }
 ];
 
 const defaultPlaygroundClasses = presetData[0].classes;
 
-const CDN_SNIPPET = `<script src="https://cdn.jsdelivr.net/npm/@debeshghorui/chaitailwind@0.1.1/dist/index.browser.js"></script>
+const CDN_SNIPPET = `<script src="https://cdn.jsdelivr.net/npm/@debeshghorui/brewcss@0.1.3/dist/index.browser.js"></script>
 <script>
     window.initchai();
 </script>`;
@@ -159,7 +159,7 @@ function renderChips() {
     }
 
     row.innerHTML = quickChips
-        .map((chip) => `<button class="chip" type="button" data-chip="${chip}">${chip.replace("chai-", "")}</button>`)
+        .map((chip) => `<button class="chip" type="button" data-chip="${chip}">${chip.replace("brew-", "")}</button>`)
         .join("");
 
     const getTokens = () =>
@@ -243,7 +243,7 @@ function renderPresets() {
 async function loadInitChai() {
     const localBundleUrl = "../dist/index.browser.js";
     const cdnBundleUrl =
-        "https://cdn.jsdelivr.net/npm/@debeshghorui/chaitailwind@0.1.1/dist/index.browser.js";
+        "https://cdn.jsdelivr.net/npm/@debeshghorui/brewcss@0.1.3/dist/index.browser.js";
 
     const globalInit = window.initchai || window.initChai;
     if (typeof globalInit === "function") {
@@ -517,7 +517,7 @@ async function initPage() {
 
     const initChai = await loadInitChai();
     if (initChai) {
-        setVersion("0.1.1");
+        setVersion("0.1.3");
         wirePlayground(initChai);
     } else {
         setVersion("load failed");

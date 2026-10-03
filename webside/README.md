@@ -1,6 +1,6 @@
-# ChaiTailwind Website
+# BrewCSS Website
 
-This folder contains a static website for showcasing the `@debeshghorui/chaitailwind` npm package.
+This folder contains a static website for showcasing the `@debeshghorui/brewcss` npm package.
 
 ## Run Locally
 
@@ -29,9 +29,9 @@ Use this in any HTML page:
 
 ```html
 <script type="module">
-  import { initChai } from "https://cdn.jsdelivr.net/npm/@debeshghorui/chaitailwind@0.1.0/dist/index.js/+esm";
+  import { initChai } from "https://cdn.jsdelivr.net/npm/@debeshghorui/brewcss@0.1.3/dist/index.js/+esm";
   initChai();
 </script>
 ```
 
-Then add utility classes like `chai-p-20`, `chai-bg-blue`, `chai-text-white` to your elements.
+Then add utility classes like `brew-p-20`, `brew-bg-blue`, `brew-text-white` to your elements.
