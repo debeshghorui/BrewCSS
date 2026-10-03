@@ -4,13 +4,14 @@ This folder contains a static website for showcasing the `@debeshghorui/brewcss`
 
 ## Run Locally
 
-From repository root:
+From the repository root, build the browser bundle and serve the repo. The playground loads `../dist/index.browser.js` first, then the jsDelivr `@0.2.0` bundle.
 
 ```bash
-npx serve webside
+npm run build
+npx serve .
 ```
 
-Or open `webside/index.html` directly in your browser.
+Open `/webside/`.
 
 ## Deploy
 
@@ -29,8 +30,8 @@ Use this in any HTML page:
 
 ```html
 <script type="module">
-  import { initChai } from "https://cdn.jsdelivr.net/npm/@debeshghorui/brewcss@0.1.3/dist/index.js/+esm";
-  initChai();
+  import { initBrew } from "https://cdn.jsdelivr.net/npm/@debeshghorui/brewcss@0.2.0/dist/index.js/+esm";
+  initBrew();
 </script>
 ```
 

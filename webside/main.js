@@ -48,6 +48,12 @@ const utilityData = [
         output: "border-radius: 16px"
     },
     {
+        name: "Border Color",
+        category: "Border",
+        sample: "brew-border-red",
+        output: "border: 1px solid #ef4444"
+    },
+    {
         name: "Flex",
         category: "Layout",
         sample: "brew-flex",
@@ -64,71 +70,91 @@ const utilityData = [
         category: "Layout",
         sample: "brew-items-center",
         output: "align-items: center"
-    },
-    {
-        name: "Border Color",
-        category: "Border",
-        sample: "brew-border-red",
-        output: "border: 1px solid #ef4444"
     }
 ];
 
-const quickChips = [
-    "brew-p-24",
-    "brew-p-12",
-    "brew-m-12",
-    "brew-bg-red",
-    "brew-bg-blue",
-    "brew-bg-green",
-    "brew-bg-yellow",
-    "brew-text-white",
-    "brew-text-black",
-    "brew-fs-18",
-    "brew-fs-24",
-    "brew-fs-32",
-    "brew-border-2",
-    "brew-border-red",
-    "brew-rounded-8",
-    "brew-rounded-24",
-    "brew-center",
-    "brew-flex",
-    "brew-justify-center",
-    "brew-items-center"
+const chipGroups = [
+    {
+        label: "Space",
+        chips: ["brew-p-12", "brew-p-24", "brew-m-12"]
+    },
+    {
+        label: "Color",
+        chips: ["brew-bg-red", "brew-bg-blue", "brew-bg-green", "brew-bg-yellow", "brew-text-white", "brew-text-black"]
+    },
+    {
+        label: "Type",
+        chips: ["brew-fs-18", "brew-fs-24", "brew-fs-32", "brew-center"]
+    },
+    {
+        label: "Box",
+        chips: ["brew-border-2", "brew-border-red", "brew-rounded-8", "brew-rounded-24"]
+    },
+    {
+        label: "Layout",
+        chips: ["brew-flex", "brew-justify-center", "brew-items-center"]
+    }
 ];
 
 const presetData = [
     {
-        name: "🎴 Card",
+        name: "Card",
         classes: "brew-p-24 brew-bg-blue brew-text-white brew-rounded-16 brew-center"
     },
     {
-        name: "🏷️ Badge",
+        name: "Badge",
         classes: "brew-p-12 brew-bg-red brew-text-white brew-rounded-24 brew-fs-18 brew-center"
     },
     {
-        name: "📦 Bordered",
+        name: "Outline",
         classes: "brew-p-20 brew-border-2 brew-rounded-16 brew-center"
     },
     {
-        name: "🌿 Success",
+        name: "Success",
         classes: "brew-p-16 brew-bg-green brew-text-white brew-rounded-8 brew-center brew-fs-18"
     },
     {
-        name: "⚠️ Warning",
+        name: "Warning",
         classes: "brew-p-16 brew-bg-yellow brew-text-black brew-rounded-8 brew-center brew-fs-18"
     },
     {
-        name: "🏗️ Flex Layout",
-        classes: "brew-flex brew-justify-center brew-items-center brew-p-24 brew-bg-blue brew-rounded-16"
+        name: "Flex row",
+        classes: "brew-flex brew-justify-center brew-items-center brew-p-24 brew-bg-blue brew-text-white brew-rounded-16"
     }
 ];
 
 const defaultPlaygroundClasses = presetData[0].classes;
 
-const CDN_SNIPPET = `<script src="https://cdn.jsdelivr.net/npm/@debeshghorui/brewcss@0.1.3/dist/index.browser.js"></script>
+const NPM_INSTALL = "npm install @debeshghorui/brewcss";
+const NPM_USAGE = `import { initBrew } from "@debeshghorui/brewcss";
+
+initBrew();`;
+
+const CDN_SNIPPET = `<script src="https://cdn.jsdelivr.net/npm/@debeshghorui/brewcss@0.2.0/dist/index.browser.js"></script>
 <script>
-    window.initchai();
+    window.initBrew();
 </script>`;
+
+const filters = ["All", ...new Set(utilityData.map((item) => item.category))];
+let activeFilter = "All";
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
+    }[char]));
+}
+
+function swatchMarkup(output) {
+    const match = String(output).match(/#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b/);
+    if (!match) {
+        return "";
+    }
+    return `<span class="swatch" style="background:${match[0]}"></span>`;
+}
 
 function renderUtilityGrid() {
     const grid = document.getElementById("utility-grid");
@@ -136,19 +162,55 @@ function renderUtilityGrid() {
         return;
     }
 
-    const cards = utilityData
+    const items = activeFilter === "All"
+        ? utilityData
+        : utilityData.filter((item) => item.category === activeFilter);
+
+    grid.innerHTML = items
         .map(
-            (item) =>
-                `<article class="utility-card">
-                    <p class="card-category">${item.category}</p>
-                    <h3>${item.name}</h3>
-                    <code>${item.sample}</code>
-                    <span class="card-arrow">→ <span>${item.output}</span></span>
-                </article>`
+            (item) => `<article class="utility-card" data-cat="${escapeHtml(item.category)}">
+                <div class="card-top">
+                    <p class="card-category">${escapeHtml(item.category)}</p>
+                    ${swatchMarkup(item.output)}
+                </div>
+                <h3>${escapeHtml(item.name)}</h3>
+                <code class="sample">${escapeHtml(item.sample)}</code>
+                <p class="output">${escapeHtml(item.output)}</p>
+            </article>`
+        )
+        .join("");
+}
+
+function renderFilters() {
+    const bar = document.getElementById("utility-filters");
+    if (!bar) {
+        return;
+    }
+
+    bar.innerHTML = filters
+        .map(
+            (name) =>
+                `<button class="filter-btn${name === activeFilter ? " is-active" : ""}" type="button" data-filter="${escapeHtml(name)}" aria-pressed="${name === activeFilter}">${escapeHtml(name)}</button>`
         )
         .join("");
 
-    grid.innerHTML = cards;
+    bar.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) {
+            return;
+        }
+        const name = target.getAttribute("data-filter");
+        if (!name) {
+            return;
+        }
+        activeFilter = name;
+        bar.querySelectorAll(".filter-btn").forEach((node) => {
+            const selected = node.getAttribute("data-filter") === name;
+            node.classList.toggle("is-active", selected);
+            node.setAttribute("aria-pressed", selected ? "true" : "false");
+        });
+        renderUtilityGrid();
+    });
 }
 
 function renderChips() {
@@ -158,8 +220,20 @@ function renderChips() {
         return;
     }
 
-    row.innerHTML = quickChips
-        .map((chip) => `<button class="chip" type="button" data-chip="${chip}">${chip.replace("brew-", "")}</button>`)
+    row.innerHTML = chipGroups
+        .map(
+            (group) => `<div class="chip-group">
+                <p class="chip-label">${escapeHtml(group.label)}</p>
+                <div class="chip-list">
+                    ${group.chips
+                        .map(
+                            (chip) =>
+                                `<button class="chip" type="button" data-chip="${escapeHtml(chip)}">${escapeHtml(chip.replace(/^brew-/, ""))}</button>`
+                        )
+                        .join("")}
+                </div>
+            </div>`
+        )
         .join("");
 
     const getTokens = () =>
@@ -171,14 +245,8 @@ function renderChips() {
     const syncActiveChips = () => {
         const tokenSet = new Set(getTokens());
         row.querySelectorAll(".chip").forEach((node) => {
-            if (!(node instanceof HTMLElement)) {
-                return;
-            }
-            const chip = node.dataset.chip;
-            if (!chip) {
-                return;
-            }
-            node.classList.toggle("is-active", tokenSet.has(chip));
+            const chip = node.getAttribute("data-chip");
+            node.classList.toggle("is-active", Boolean(chip && tokenSet.has(chip)));
         });
     };
 
@@ -194,12 +262,12 @@ function renderChips() {
         }
 
         const tokens = getTokens();
-        const hasChip = tokens.includes(chip);
-        const nextTokens = hasChip ? tokens.filter((token) => token !== chip) : [...tokens, chip];
+        const nextTokens = tokens.includes(chip)
+            ? tokens.filter((token) => token !== chip)
+            : [...tokens, chip];
 
         input.value = nextTokens.join(" ");
         input.dispatchEvent(new Event("input", { bubbles: true }));
-        syncActiveChips();
     });
 
     input.addEventListener("input", syncActiveChips);
@@ -216,9 +284,18 @@ function renderPresets() {
     row.innerHTML = presetData
         .map(
             (preset) =>
-                `<button class="preset-btn" type="button" data-preset="${preset.name}">${preset.name}</button>`
+                `<button class="preset-btn" type="button" data-preset="${escapeHtml(preset.name)}">${escapeHtml(preset.name)}</button>`
         )
         .join("");
+
+    const syncActivePreset = () => {
+        const current = input.value.trim().replace(/\s+/g, " ");
+        row.querySelectorAll(".preset-btn").forEach((node) => {
+            const name = node.getAttribute("data-preset");
+            const found = presetData.find((item) => item.name === name);
+            node.classList.toggle("is-active", Boolean(found && found.classes === current));
+        });
+    };
 
     row.addEventListener("click", (event) => {
         const target = event.target;
@@ -238,14 +315,17 @@ function renderPresets() {
         input.value = found.classes;
         input.dispatchEvent(new Event("input", { bubbles: true }));
     });
+
+    input.addEventListener("input", syncActivePreset);
+    syncActivePreset();
 }
 
-async function loadInitChai() {
+async function loadInitBrew() {
     const localBundleUrl = "../dist/index.browser.js";
     const cdnBundleUrl =
-        "https://cdn.jsdelivr.net/npm/@debeshghorui/brewcss@0.1.3/dist/index.browser.js";
+        "https://cdn.jsdelivr.net/npm/@debeshghorui/brewcss@0.2.0/dist/index.browser.js";
 
-    const globalInit = window.initchai || window.initChai;
+    const globalInit = window.initBrew || window.initbrew || window.initchai || window.initChai;
     if (typeof globalInit === "function") {
         return globalInit;
     }
@@ -263,7 +343,7 @@ async function loadInitChai() {
                 document.head.appendChild(script);
             });
 
-            const loadedInit = window.initchai || window.initChai;
+            const loadedInit = window.initBrew || window.initbrew || window.initchai || window.initChai;
             if (typeof loadedInit === "function") {
                 return loadedInit;
             }
@@ -303,18 +383,26 @@ function wireNavbar() {
     const setActive = (id) => {
         links.forEach((link) => {
             const targetId = link.getAttribute("href")?.slice(1);
-            link.classList.toggle("is-active", targetId === id);
+            const active = targetId === id;
+            link.classList.toggle("is-active", active);
+            if (active) {
+                link.setAttribute("aria-current", "true");
+            } else {
+                link.removeAttribute("aria-current");
+            }
         });
     };
 
     const closeMenu = () => {
         nav.classList.remove("is-open");
         toggle.setAttribute("aria-expanded", "false");
+        toggle.setAttribute("aria-label", "Open menu");
     };
 
     const openMenu = () => {
         nav.classList.add("is-open");
         toggle.setAttribute("aria-expanded", "true");
+        toggle.setAttribute("aria-label", "Close menu");
     };
 
     toggle.addEventListener("click", () => {
@@ -327,38 +415,50 @@ function wireNavbar() {
 
     links.forEach((link) => {
         link.addEventListener("click", () => {
-            if (window.innerWidth <= 900) {
+            if (window.innerWidth <= 860) {
                 closeMenu();
             }
         });
     });
 
-    const sectionTargets = links
-        .map((link) => link.getAttribute("href")?.slice(1))
-        .filter(Boolean)
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            closeMenu();
+        }
+    });
+
+    document.addEventListener("click", (event) => {
+        if (event.target instanceof Node && !topbar.contains(event.target)) {
+            closeMenu();
+        }
+    });
+
+    const sectionTargets = [...new Set(
+        links
+            .map((link) => link.getAttribute("href")?.slice(1))
+            .filter(Boolean)
+    )]
         .map((id) => document.getElementById(id))
         .filter((node) => node instanceof HTMLElement);
 
     if (sectionTargets.length > 0) {
         const observer = new IntersectionObserver(
             (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        setActive(entry.target.id);
-                    }
-                });
+                const visible = entries
+                    .filter((entry) => entry.isIntersecting)
+                    .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+                if (visible) {
+                    setActive(visible.target.id);
+                }
             },
             {
-                rootMargin: "-30% 0px -55% 0px",
-                threshold: 0.01
+                rootMargin: "-20% 0px -55% 0px",
+                threshold: [0.1, 0.25, 0.5]
             }
         );
 
         sectionTargets.forEach((section) => observer.observe(section));
     }
-
-    const startId = window.location.hash ? window.location.hash.slice(1) : "home";
-    setActive(startId);
 
     const syncScrolledState = () => {
         topbar.classList.toggle("is-scrolled", window.scrollY > 6);
@@ -368,7 +468,32 @@ function wireNavbar() {
     window.addEventListener("scroll", syncScrolledState, { passive: true });
 }
 
-function wirePlayground(initChai) {
+function flashCopy(button) {
+    if (button.dataset.copying === "1") {
+        return;
+    }
+
+    const original = button.textContent;
+    button.dataset.copying = "1";
+    button.textContent = "Copied";
+    button.classList.add("is-copied");
+    window.setTimeout(() => {
+        button.textContent = original;
+        button.classList.remove("is-copied");
+        delete button.dataset.copying;
+    }, 1200);
+}
+
+async function copyText(button, text) {
+    try {
+        await navigator.clipboard.writeText(text);
+        flashCopy(button);
+    } catch (error) {
+        console.warn("Copy failed", error);
+    }
+}
+
+function wirePlayground(initBrew) {
     const input = document.getElementById("class-input");
     const button = document.getElementById("apply-btn");
     const resetButton = document.getElementById("reset-btn");
@@ -380,7 +505,7 @@ function wirePlayground(initChai) {
     const copyClassesBtn = document.getElementById("copy-classes-btn");
     const copyStylesBtn = document.getElementById("copy-styles-btn");
 
-    if (!input || !button || !resetButton || !autoApply || !classCount || !activeClasses || !preview || !initChai) {
+    if (!input || !button || !resetButton || !autoApply || !classCount || !activeClasses || !preview || !initBrew) {
         return;
     }
 
@@ -396,31 +521,49 @@ function wirePlayground(initChai) {
         if (!stylesOutput) {
             return;
         }
-        const cssText = preview.style.cssText;
-        if (!cssText) {
-            stylesOutput.textContent = "— no styles yet —";
+
+        const names = getClassString().split(" ").filter((name) => name.startsWith("brew-"));
+        if (names.length === 0) {
+            stylesOutput.textContent = "Add a brew-* class to generate CSS.";
             return;
         }
 
-        const formatted = cssText
-            .split(";")
-            .map((s) => s.trim())
-            .filter(Boolean)
-            .map((s) => `${s};`)
-            .join("\n");
+        const sheet = document.getElementById("brewcss")?.sheet;
+        const blocks = [];
 
-        stylesOutput.textContent = formatted;
+        names.forEach((name) => {
+            const selector = `.${CSS.escape(name)}`;
+            let found = false;
+
+            if (sheet) {
+                for (let i = 0; i < sheet.cssRules.length; i++) {
+                    const rule = sheet.cssRules[i];
+                    if (rule.selectorText !== selector || !rule.style) {
+                        continue;
+                    }
+                    found = true;
+                    const body = rule.style.cssText
+                        .split(";")
+                        .map((part) => part.trim())
+                        .filter(Boolean)
+                        .join(";\n  ");
+                    blocks.push(`${selector} {\n  ${body};\n}`);
+                }
+            }
+
+            if (!found) {
+                blocks.push(`/* ${name} did not match a utility */`);
+            }
+        });
+
+        stylesOutput.textContent = blocks.join("\n");
     };
 
     const apply = () => {
-        preview.className = "preview-box";
-        preview.removeAttribute("style");
         const classes = getClassString();
-        if (classes) {
-            preview.className = `preview-box ${classes}`;
-        }
+        preview.className = classes ? `preview-box ${classes}` : "preview-box";
         updateMeta(classes);
-        initChai();
+        initBrew();
         updateGeneratedStyles();
     };
 
@@ -446,38 +589,15 @@ function wirePlayground(initChai) {
         }
     });
 
-    // Copy buttons
-    const flashCopy = (btn, original) => {
-        if (!btn) return;
-        const origHTML = btn.innerHTML;
-        btn.innerHTML = "✓";
-        btn.style.color = "#74f2cd";
-        setTimeout(() => {
-            btn.innerHTML = origHTML;
-            btn.style.color = "";
-        }, 1200);
-    };
-
     if (copyClassesBtn) {
-        copyClassesBtn.addEventListener("click", async () => {
-            try {
-                await navigator.clipboard.writeText(getClassString());
-                flashCopy(copyClassesBtn);
-            } catch (e) {
-                console.warn("Copy failed", e);
-            }
+        copyClassesBtn.addEventListener("click", () => {
+            copyText(copyClassesBtn, getClassString());
         });
     }
 
     if (copyStylesBtn) {
-        copyStylesBtn.addEventListener("click", async () => {
-            try {
-                const text = stylesOutput ? stylesOutput.textContent : "";
-                await navigator.clipboard.writeText(text);
-                flashCopy(copyStylesBtn);
-            } catch (e) {
-                console.warn("Copy failed", e);
-            }
+        copyStylesBtn.addEventListener("click", () => {
+            copyText(copyStylesBtn, stylesOutput ? stylesOutput.textContent || "" : "");
         });
     }
 
@@ -487,40 +607,50 @@ function wirePlayground(initChai) {
 function wireSnippetCopy() {
     const code = document.getElementById("cdn-code");
     const copyBtn = document.getElementById("copy-cdn-btn");
-    if (!code || !copyBtn) {
-        return;
+    const npmBtn = document.getElementById("copy-npm-btn");
+    const usageBtn = document.getElementById("copy-usage-btn");
+
+    if (code) {
+        code.textContent = CDN_SNIPPET;
     }
 
-    code.textContent = CDN_SNIPPET;
+    if (copyBtn) {
+        copyBtn.addEventListener("click", () => copyText(copyBtn, CDN_SNIPPET));
+    }
+    if (npmBtn) {
+        npmBtn.addEventListener("click", () => copyText(npmBtn, NPM_INSTALL));
+    }
+    if (usageBtn) {
+        usageBtn.addEventListener("click", () => copyText(usageBtn, NPM_USAGE));
+    }
+}
 
-    copyBtn.addEventListener("click", async () => {
-        try {
-            await navigator.clipboard.writeText(CDN_SNIPPET);
-            const origHTML = copyBtn.innerHTML;
-            copyBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Copied!`;
-            window.setTimeout(() => {
-                copyBtn.innerHTML = origHTML;
-            }, 1400);
-        } catch (error) {
-            console.warn("Clipboard copy failed", error);
-        }
-    });
+function showEngineError() {
+    const preview = document.getElementById("preview");
+    if (!preview) {
+        return;
+    }
+    const note = document.createElement("p");
+    note.className = "engine-error";
+    note.textContent = "The BrewCSS bundle did not load. Run npm run build from the repo root, then reload.";
+    preview.before(note);
 }
 
 async function initPage() {
     setFooterYear();
     wireNavbar();
+    renderFilters();
     renderUtilityGrid();
     renderChips();
     renderPresets();
     wireSnippetCopy();
 
-    const initChai = await loadInitChai();
-    if (initChai) {
-        setVersion("0.1.3");
-        wirePlayground(initChai);
+    const initBrew = await loadInitBrew();
+    if (initBrew) {
+        wirePlayground(initBrew);
     } else {
-        setVersion("load failed");
+        setVersion("unavailable");
+        showEngineError();
     }
 }
 
